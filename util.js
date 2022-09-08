@@ -45,13 +45,24 @@ function find_x_y(A, D, t, n) {
     return [x, y];
 }
 
+function calculateIL (A, D, t, n) {
+    // Value if not in the liquidity pool
+    let value_1 = (D/2) * (1 - t)
+    console.log (value_1)
 
+    let x_y = find_x_y(A, D, t, n)
+    // Value if in the liquidity pool
+    let value_2 = (x_y[0] * (-t)) + (x_y[1])
+    console.log (value_2)
 
+    return (1 - (value_2 / value_1)) * 100
+}
+
+/*
 let A = 25
 let D = 1
 let t = -0.96
 let n = 2
 
-let x_y = find_x_y(A, D, t, n)
-
-console.log(x_y[0], x_y[1])
+console.log(calculateIL(A, D, t, n))
+*/
