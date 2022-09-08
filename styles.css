@@ -1,0 +1,37 @@
+h1 {
+    text-align: center;
+}
+
+div.main {
+    float: center;
+    max-width: 500px;
+    height: 250px;
+    margin: 0 auto;
+    border-style: solid;
+    border-radius: 5px;
+}
+
+
+input.text{
+    width: 33%;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button.submit{
+  width: 66%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+button.submit:hover{
+  background-color: #45a049;
+}
