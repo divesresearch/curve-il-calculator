@@ -9,19 +9,38 @@
 <body>
 
     <div class="box" style="background: #3465a4;">
-        <h1> Dives Research </h1> 
+        <h1> Curve <abbr title="Impermanent Loss">IL</abbr> Calculator </h1> 
     </div>
 
     <div class="box">
         <fieldset>
-            <legend class="text-center"> <b> IL Calculator </b> </legend>
+            <legend> <b> Calculator </b> </legend>
         <br>
         <center>
+            <div class="container"> 
+                <div class="custom-select">
+                    <select>
+                        <option value="" disabled selected>
+                            Select a Blockchain 
+                        </option>
+                        <option value="ethereum">Ethereum</option>
+                        <option value="binance">Binance</option>
+                    </select>
+                </div>
+                <div class="custom-select">
+                    <select name="pools" id="pools">
+                        <option value="" disabled selected>
+                            Select a Pool 
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <br>
             <input class="text" id="initial_price" name="fname" value=""
             placeholder="Initial Price">
             <input class="text" id="future_price" name="fname" value=""
             placeholder="Future Price">
-            <br>
+            <br> <br> 
             <button> Calculate </button>
         </center>
         </fieldset>
@@ -30,13 +49,11 @@
 
     <div class="box">
         <fieldset>
-
-            <legend class="text-center"> <b> Info </b> </legend>
-            <p class="text-center"> Lorem ipsum dolem obaley </p> 
+            <legend> <b> Info/Disclaimer </b> </legend>
+            <p> This app is not an official app audited by
+            Curve.fi and is developed by Dives Research voluntarily. </p> 
         </fieldset>
     </div>
 
-    <script>
-    </script>
 </body>
 </html>

@@ -3,7 +3,6 @@ html {
     background: #a5a4ce;
 }
 
-
 h1 {
     text-align: center;
     color: white;
@@ -15,8 +14,6 @@ button{
     padding: 8px 20px;
     font-weight: bolder;
     color: #fff;
-    font-family: inherit;
-    font-size: inherit;
     background: green;
     border: 1px outset green;
 }
@@ -25,22 +22,33 @@ button:hover{
   background-color: #45a049;
 }
 
-fieldset {
-    display: block;
-    min-width: 0;
-    border-width: 2px;
-    border-style: groove;
-    border-color: rgb(192, 192, 192);
-    border-image: initial;
-}
-
 legend {
     text-align: center;
     display: block;
-    border-width: initial;
-    border-style: none;
-    border-color: initial;
-    border-image: initial;
+}
+
+select {
+    text-align: center;
+    width: 100%;
+    border-radius: 4px;
+    padding: 10px 22px;
+    font-weight: bolder;
+    box-sizing: border-box;
+    background: white;
+}
+
+div .container{
+    align: center;
+    text-align: center;
+    padding: 0px 16%;
+}
+
+div .custom-select{
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin: 15px 0;
+    border-style: inset;
 }
 
 input.text{
@@ -61,10 +69,6 @@ input.text{
 }
 
 .box p {
+    text-align: left;
     margin: 0px;
-}
-
-
-.text-center{
-    text-align: center;
 }
