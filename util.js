@@ -19,7 +19,7 @@ function find_x_y({
     precision = 0.75,
     iteration = 15 
 }) {
-        let y1
+    let y
     for (let i = 0; i < iteration; i++) {
         // Solve Derivative Equation
         y = solvePolynomial(
@@ -72,4 +72,42 @@ function calculateIL (A, D, t1, t2, n) {
     }
 
     return (1 - (value_2 / value_1)) * 100
+}
+
+
+/*
+ * returns { name, addres, chain, rpc, A, n } 
+ */
+async function fetchPoolDatas(chainName, poolName){
+    const 
+        poolData = poolDatas.filter(poolData => poolData.chain == chainName).find(poolData => poolData.name == poolName),
+        address = poolData.lp_address,
+        chainData = chainDatas.find(chainData => chainData.chain_name == chainName),
+        rpc = chainData.rpc,
+        chainID = chainData.chain_id,
+        provider = new ethers.providers.JsonRpcProvider(rpc),
+        lpContract = new ethers.Contract(address, StableSwapABI, provider),
+        A_contract = await lpContract.A()
+
+    let n = 0, condition = true
+    
+    for (let i = 0; condition; i++) {
+        try {
+            if ( await lpContract.coins(ethers.BigNumber.from(i)) != null ) n += 1
+            else condition = false
+        }
+        catch (error) {
+            condition = false
+
+            const A = A_contract.toNumber() / (n ** (n - 1))
+        }
+    }
+    return {
+        poolName,
+        address,
+        chainID,
+        rpc,
+        A,
+        n
+    }
 }
