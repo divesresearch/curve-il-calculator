@@ -1,7 +1,7 @@
 // Derivative Equation
-// (A * (n ** n) * (t + 1)) y_2 
+// (A * (n ** n) * (price + 1)) y_2 
 // ((D ** (n + 1)) / ((n ** n) * (x ** 2))) y_1 
-// (((D ** (n + 1)) * t) / ((n ** n) * x)) y_0
+// (((D ** (n + 1)) * price) / ((n ** n) * x)) y_0
 
 // StableSwap Equation
 // (A * (n ** n)) y_2
@@ -14,7 +14,10 @@ function solvePolynomial(a, b, c) {
 }
 
 function find_x_y({
-    A, D, t, n,
+    A, // Amplification Coefficient
+    D, // Total amount of coins when they have an equal price
+    price,
+    n, // Number of tokens in the pool
     x = 1.5,
     precision = 0.75,
     iteration = 15 
@@ -23,9 +26,9 @@ function find_x_y({
     for (let i = 0; i < iteration; i++) {
         // Solve Derivative Equation
         y = solvePolynomial(
-                (A * (n ** n) * (t + 1)), 
+                (A * (n ** n) * (1 - price)), 
                 ((D ** (n + 1)) / ((n ** n) * (x ** 2))), 
-                (((D ** (n + 1)) * t) / ((n ** n) * x))
+                (((D ** (n + 1)) * (-1 * price)) / ((n ** n) * x))
             )
         
         // Solve StableSwap Equation
@@ -35,7 +38,7 @@ function find_x_y({
                 -((D ** (n + 1)) / ((n ** n) * x))
             )
 
-        if( y != y2 )
+        if ( y != y2 )
             x = y < y2 
                 ? x + precision 
                 : x - precision
@@ -46,31 +49,36 @@ function find_x_y({
     return [x, y]
 }
 
-function calculateIL (A, D, t1, t2, n) {
-    let value_1, value_2
-    
-        if ( t1 > t2 ) 
-        [t1, t2] = [t2, t1]
+function calculateIL (A, D, initial_price, final_price, n) {
+    let value_1, value_2, x, y;
 
-    if ( t1 != -1 ) {
-        const [x, y] = find_x_y({A, D, t: t1, n})
-        // Value if not in the liquidity pool
-        value_1 = x * (- t2) + y 
+    // Value if not in the liquidity pool
+    if ( initial_price < 1 ) {
+        [x, y] = find_x_y({A, D, price: initial_price, n})
+        value_1 = x * final_price + y
+    }
+    else if ( initial_price > 1 ) {
+        [y, x] = find_x_y({A, D, price: (1 / initial_price), n})
+        value_1 = x * final_price + y
     }
     else {
-        value_1 = D/2 * (1 - t2)
+        value_1 = D/2 * (1 + final_price)
     }
 
-    
-    if ( t2 != -1 ) {
-                let [x, y] = find_x_y({A, D, t: t2, n})
-        // Value if in the liquidity pool
-        value_2 = (x * (-t2)) + y
+    // Value if in the liquidity pool
+    if ( final_price < 1 ) {
+        [x, y] = find_x_y({A, D, price: final_price, n})
+        value_2 = x * final_price + y
+    }
+    else if ( final_price > 1 ) {
+        [y, x] = find_x_y({A, D, price: (1 / final_price), n})
+        value_2 = x * final_price + y
     }
     else {
-        value_2 = D/2 * (1 - t2)
+        value_2 = D/2 * (1 + final_price)
     }
 
+    // Impermanent loss
     return (1 - (value_2 / value_1)) * 100
 }
 
