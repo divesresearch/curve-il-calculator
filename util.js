@@ -94,10 +94,10 @@ async function fetchPoolDatas(chainName, poolName){
         rpc = chainData.rpc,
         chainID = chainData.chain_id,
         provider = new ethers.providers.JsonRpcProvider(rpc),
-        lpContract = new ethers.Contract(address, StableSwapABI, provider),
+        lpContract = new ethers.Contract(address, poolData.abi, provider),
         A_contract = await lpContract.A()
 
-    let n = 0, condition = true
+    let A, n = 0, condition = true
     
     for (let i = 0; condition; i++) {
         try {
@@ -107,7 +107,7 @@ async function fetchPoolDatas(chainName, poolName){
         catch (error) {
             condition = false
 
-            const A = A_contract.toNumber() / (n ** (n - 1))
+            A = A_contract.toNumber() / (n ** (n - 1))
         }
     }
     return {

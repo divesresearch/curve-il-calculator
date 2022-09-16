@@ -5,4 +5,4 @@ let final_price = 0.8
 let n = 2
 
 console.log(calculateIL(A, D, initial_price, final_price, n))
-console.log(fetchPoolDatas('ethereum', 'STETH-ETH'))
+console.log(fetchPoolDatas('Ethereum', 'cDAI-cUSDC'))
