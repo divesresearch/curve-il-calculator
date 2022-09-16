@@ -22,12 +22,10 @@
         <center>
             <div class="container"> 
                 <div class="custom-select">
-                    <select>
+                    <select id="blockchains">
                         <option value="" disabled selected>
                             Select a Blockchain 
                         </option>
-                        <option value="ethereum">Ethereum</option>
-                        <option value="binance">Binance</option>
                     </select>
                 </div>
                 <div class="custom-select">
@@ -41,10 +39,11 @@
             <br>
             <input class="text" id="initial_price" name="fname" value=""
             placeholder="Initial Price">
-            <input class="text" id="future_price" name="fname" value=""
-            placeholder="Future Price">
+            <input class="text" id="final_price" name="fname" value=""
+            placeholder="Final Price">
             <br> <br> 
-            <button> Calculate </button>
+            <button id="calculate"> Calculate </button>
+            <div id="result"> </div>
         </center>
         </fieldset>
 
@@ -57,6 +56,62 @@
             Curve.fi and is developed by Dives Research voluntarily. </p> 
         </fieldset>
     </div>
+
+    <script>
+        const
+            [blockchains, pools, calculate, result] = 
+                ["blockchains", "pools", "calculate", "result"]
+                    .map( id => document.getElementById(id) )
+
+        chainDatas
+            .map( ({chain_name : name})  => { 
+                const option = document.createElement("option")
+                option.text = name
+                return option
+            })
+            .forEach( (option) => 
+                blockchains.add( option )
+            )
+
+        blockchains.addEventListener('click', () => {
+            const 
+                chainName = 
+                    blockchains.options[blockchains.selectedIndex].value,
+                poolNames =
+                    poolDatas
+                        .filter(poolData => poolData.chain == chainName)
+                        .map(({name}) => name )
+
+            for(let i = pools.options.length - 1; i >= 0; i--) {
+                pools.remove(i);
+            }
+                    
+            for(const pName of poolNames){
+                const option = document.createElement("option")
+                option.text = pName
+                pools.add(option) 
+            }
+        })
+
+        calculate.addEventListener('click', async () => {
+            const 
+                [chainName, poolName] = 
+                    [blockchains, pools]
+                        .map( selector => 
+                            selector.options[selector.selectedIndex].value ),
+
+                [initPrice, finalPrice] = 
+                    ['initial_price', 'final_price']
+                        .map( id => document.getElementById(id).value )
+                        .map( parseFloat ),
+            
+                {A, n} = await fetchPoolDatas(chainName, poolName),
+
+                loss = calculateIL(A, 1, initPrice, finalPrice, n)
+            
+            result.innerText = loss
+        })
+    </script>
 
 </body>
 </html>
