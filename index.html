@@ -43,11 +43,10 @@
             placeholder="Final Price">
             <br> <br> 
             <button id="calculate"> Calculate </button>
-            <div id="result"> 
+            <div id="result" style="margin-top: 15x;"> 
             </div>
         </center>
         </fieldset>
-
     </div>
 
     <div class="box">
@@ -58,6 +57,18 @@
         </fieldset>
     </div>
 
+    <div style=" white; position: fixed; bottom: 0; right: 0; width: 100%;">
+        <center>
+            <a href="https://www.dives.fyi"><img src="images/dives.png"
+                class="icon"></a> 
+            <a href="https://github.com/orgs/divesresearch/repositories"><img
+                src="images/github.png" class="icon"></a>
+            <a href="https://twitter.com/DivesResearch"><img
+               src="images/twitter.png" class="icon"/></a>
+            <a href="https://t.me/divesresearch"><img src="images/telegram.png"
+                class="icon"/></a>
+        </center>
+    </div>
     <script>
         const
             [blockchains, pools, calculate, result] = 
@@ -96,7 +107,7 @@
 
         calculate.addEventListener('click', async () => {
             
-            result.innerHTML = '<img src="clock.gif" width="30px" \
+            result.innerHTML = '<img src="images/clock.gif" width="30px" \
                     height="30px"/>'
             const 
                 [chainName, poolName] = 

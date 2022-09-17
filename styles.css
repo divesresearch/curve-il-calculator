@@ -69,6 +69,15 @@ input.text{
 }
 
 .box p {
-    text-align: left;
+    text-align: center;
     margin: 0px;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+}
+
+.icon:hover {
+    transform: scale(1.1);
 }
