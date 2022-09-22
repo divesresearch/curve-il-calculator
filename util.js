@@ -18,9 +18,9 @@ function find_x_y({
     D, // Total amount of coins when they have an equal price
     price,
     n, // Number of tokens in the pool
-    x = 1.5,
-    precision = 0.75,
-    iteration = 15 
+    x = 16,
+    precision = x/2,
+    iteration = 20 
 }) {
     let y
     for (let i = 0; i < iteration; i++) {
