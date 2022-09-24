@@ -1,17 +1,32 @@
-// Derivative Equation
-// (A * (n ** n) * (price + 1)) y_2 
-// ((D ** (n + 1)) / ((n ** n) * (x ** 2))) y_1 
-// (((D ** (n + 1)) * price) / ((n ** n) * x)) y_0
+function solvePolynomial(a, b, c) {
+    if ( a != 0 ) {
+        let delta = (b ** 2) - (4 * a * c)
+        return (Math.sqrt (delta) - b) / (2 * a)
+    }
+    return (- c / b)
+ }
 
-// StableSwap Equation
-// (A * (n ** n)) y_2
-// ((A * (n ** n)) * x + D - ((A * (n ** n)) * D)) y_1
-// -((D ** (n + 1)) / ((n ** n) * x)) y_0
-
-function solvePolynomial(a, b, c) { 
-    let delta = (b ** 2) - (4 * a * c)
-    return (Math.sqrt (delta) - b) / (2 * a)
+function findAmounts({
+    A, // Amplification Coefficient
+    D = 1, // Total amount of coins when they have an equal price
+    prices,
+    n, // Number of tokens in the pool
+}) {
+    if ( n == 2 ) return find_x_y({A, D, price: prices, n})
+    if ( n == 3 ) return find_x_y_z({A, D, prices, n})
 }
+
+/*
+ * StableSwap Equation
+ * (A * (n ** n)) y^2 +
+ * ((A * (n ** n)) * x + D - ((A * (n ** n)) * D)) y +
+ * -((D ** (n + 1)) / ((n ** n) * x))
+ *
+ * Derivative Equation
+ * (A * (n ** n) * (1 - price)) y^2 +
+ * ((D ** (n + 1)) / ((n ** n) * (x ** 2))) y +
+ * (((D ** (n + 1)) * -price) / ((n ** n) * x)) 
+*/
 
 function find_x_y({
     A, // Amplification Coefficient
@@ -19,10 +34,9 @@ function find_x_y({
     price,
     n, // Number of tokens in the pool
     x = 16,
-    precision = x/2,
-    iteration = 20 
+    iteration = 30 
 }) {
-    let y
+    let y, precision = x / 2
     for (let i = 0; i < iteration; i++) {
         // Solve Derivative Equation
         y = solvePolynomial(
@@ -37,7 +51,7 @@ function find_x_y({
                 ((A * (n ** n)) * x + D - ((A * (n ** n)) * D)), 
                 -((D ** (n + 1)) / ((n ** n) * x))
             )
-
+        
         if ( y != y2 )
             x = y < y2 
                 ? x + precision 
@@ -49,37 +63,125 @@ function find_x_y({
     return [x, y]
 }
 
-function calculateIL (A, D, initial_price, final_price, n) {
-    let value_1, value_2, x, y;
+function find_x_y_z({
+    A, // Amplification Coefficient
+    D, // Total amount of coins when they have an equal price
+    z = 0.5, 
+    prices,
+    n, // Number of tokens in the pool
+    x = 16,
+    iteration = 30 
+}) {
+    let y, y2, x1, precision_x, precision_z = z / 2
+    for (let i = 0; i < iteration; i++) {
+        x1 = x
+        precision_x = x / 2
+        for (let j = 0; j < iteration; j++) {
+            // Solve Derivative Equation
+            y = solvePolynomial(
+                    (A * (n ** n) * (1 - prices[0])), 
+                    (D ** (n + 1)) / (z * ((n ** n) * (x1 ** 2))), 
+                    ((D ** (n + 1)) * (-1 * prices[0])) / (z * ((n ** n) * x1))
+                )
+            
+            // Solve StableSwap Equation
+            y2 = solvePolynomial(
+                    (A * (n ** n)), 
+                    ((A * (n ** n)) * (x1 + z) + D - ((A * (n ** n)) * D)), 
+                    -((D ** (n + 1)) / ((n ** n) * x1 * z))
+                )
+            
+            if ( y != y2 )
+                x1 = y < y2 
+                    ? x1 + precision_x
+                    : x1 - precision_x
+
+            precision_x /= 2
+        }
+
+        const y3 =  -((1 / ((x1 ** 2) * z)) 
+                    + ((-1 * prices[1]) / ((z ** 2) * x1))) * (D ** (n + 1)) 
+                    / (A * (n ** (2 * n)) * (1 - prices[1]))
+        if ( y2 != y3 )
+            z = y2 < y3
+                ? z + precision_z
+                : z - precision_z
+
+        precision_z /= 2
+    }
+    return [x1, y, z]
+}
+
+function calculateIL(A, initialPrices, finalPrices, n) {
+    if ( n == 2 ) return calculateILFor2(A, initialPrices, finalPrices, n)
+    if ( n == 3 ) return calculateILFor3(A, initialPrices, finalPrices, n)
+}
+
+function calculateILFor2(A, initialPrice, finalPrice, n) {
+    let value_1, value_2, initialAmounts, finalAmounts
 
     // Value if not in the liquidity pool
-    if ( initial_price < 1 ) {
-        [x, y] = find_x_y({A, D, price: initial_price, n})
-        value_1 = x * final_price + y
-    }
-    else if ( initial_price > 1 ) {
-        [y, x] = find_x_y({A, D, price: (1 / initial_price), n})
-        value_1 = x * final_price + y
+    if (initialPrice <= 1) {
+        initialAmounts = findAmounts({A, prices: initialPrice, n})
+        value_1 = initialAmounts[0] * finalPrice + initialAmounts[1]
     }
     else {
-        value_1 = D/2 * (1 + final_price)
+        initialAmounts = findAmounts({A, prices: 1 / initialPrice, n})
+        value_1 = initialAmounts[1] * finalPrice + initialAmounts[0]
     }
 
     // Value if in the liquidity pool
-    if ( final_price < 1 ) {
-        [x, y] = find_x_y({A, D, price: final_price, n})
-        value_2 = x * final_price + y
-    }
-    else if ( final_price > 1 ) {
-        [y, x] = find_x_y({A, D, price: (1 / final_price), n})
-        value_2 = x * final_price + y
+    if (finalPrice <= 1) {
+        finalAmounts = findAmounts({A, prices: finalPrice, n})
+        value_2 = finalAmounts[0] * finalPrice + finalAmounts[1]
     }
     else {
-        value_2 = D/2 * (1 + final_price)
+        finalAmounts = findAmounts({A, prices: 1 / finalPrice, n})
+        value_2 = finalAmounts[1] * finalPrice + finalAmounts[0]
     }
-
     // Impermanent loss
-    return (1 - (value_2 / value_1)) * 100
+    return {
+        impermanentLoss: (1 - (value_2 / value_1)) * 100,
+        initialAmounts,
+        finalAmounts
+    }
+}
+
+function calculateILFor3(A, initialPrices, finalPrices, n){
+    let 
+        value_1 = 0, 
+        value_2 = 0, 
+        initialAmounts,
+        finalAmounts
+
+    initialPrices.sort().reverse()
+    finalPrices.sort().reverse()
+
+    const 
+        initial_relative_prices =   [initialPrices[1] / initialPrices[0], 
+                                    initialPrices[2] / initialPrices[0]],
+        final_relative_prices =     [finalPrices[1] / finalPrices[0], 
+                                    finalPrices[2] / finalPrices[0]]
+
+    initialAmounts = findAmounts({A, prices: initial_relative_prices, n})
+    initialAmounts.sort()
+    finalAmounts = findAmounts({A, prices: final_relative_prices, n})
+    finalAmounts.sort()
+
+    
+    for (i = 0; i < initialAmounts.length; i++) {
+        // Value if not in the liquidity pool
+        value_1 += initialAmounts[i] * finalPrices[i]
+        // Value if in the liquidity pool
+        value_2 += finalAmounts[i] * finalPrices[i]
+    }
+    
+    // Impermanent loss
+    return {
+        impermanentLoss: (1 - (value_2 / value_1)) * 100,
+        initialAmounts,
+        finalAmounts
+    }
 }
 
 
@@ -88,7 +190,8 @@ function calculateIL (A, D, initial_price, final_price, n) {
  */
 async function fetchPoolDatas(chainName, poolName){
     const 
-        poolData = poolDatas.filter(poolData => poolData.chain == chainName).find(poolData => poolData.name == poolName),
+        poolData = poolDatas.filter(poolData => poolData.chain == chainName)
+                            .find(poolData => poolData.name == poolName),
         address = poolData.lp_address,
         chainData = chainDatas.find(chainData => chainData.chain_name == chainName),
         rpc = chainData.rpc,
