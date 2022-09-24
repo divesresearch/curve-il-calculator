@@ -153,9 +153,9 @@ function calculateILFor3(A, initialPrices, finalPrices, n){
         value_2 = 0, 
         initialAmounts,
         finalAmounts
-
-    initialPrices.sort().reverse()
-    finalPrices.sort().reverse()
+        
+    initialPrices.sort((a, b) => a - b).reverse()
+    finalPrices.sort((a, b) => a - b).reverse()
 
     const 
         initial_relative_prices =   [initialPrices[1] / initialPrices[0], 
@@ -164,9 +164,9 @@ function calculateILFor3(A, initialPrices, finalPrices, n){
                                     finalPrices[2] / finalPrices[0]]
 
     initialAmounts = findAmounts({A, prices: initial_relative_prices, n})
-    initialAmounts.sort()
+    initialAmounts.sort((a, b) => a - b)
     finalAmounts = findAmounts({A, prices: final_relative_prices, n})
-    finalAmounts.sort()
+    finalAmounts.sort((a, b) => a - b)
 
     
     for (i = 0; i < initialAmounts.length; i++) {
