@@ -33,8 +33,49 @@ const
             lp_address: '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56',
             chain: 'Ethereum',
             abi: stableSwapABI2
+        },
+        {
+            name: 'FRAX-USDC',
+            lp_address: '0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2',
+            chain: 'Ethereum',
+            abi: stableSwapABI1
+        },
+        {
+            name: 'alETH-ETH',
+            lp_address: '0xC4C319E2D4d66CcA4464C0c2B32c9Bd23ebe784e',
+            chain: 'Ethereum',
+            abi: stableSwapABI1
+        },
+        {
+            name: 'cDAI-cUSDC-USDT',
+            lp_address: '0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C',
+            chain: 'Ethereum',
+            abi: stableSwapABI2
+        },
+        {
+            name: 'DAI-USDC-USDT',
+            lp_address: '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7',
+            chain: 'Ethereum',
+            abi: stableSwapABI1
+        },
+        {
+            name: 'agEUR-EURT-EURS',
+            lp_address: '0xb9446c4ef5ebe66268da6700d26f96273de3d571',
+            chain: 'Ethereum',
+            abi: stableSwapABI1
+        },
+        {
+            name: 'renBTC-wBTC-sBTC',
+            lp_address: '0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714',
+            chain: 'Ethereum',
+            abi: stableSwapABI2
+        },
+        {
+            name: 'cyDAI-cyUSDT-cyUSDC',
+            lp_address: '0x2dded6Da1BF5DBdF597C45fcFaa3194e53EcfeAF',
+            chain: 'Ethereum',
+            abi: stableSwapABI1
         }
-        
     ],
 
     chainDatas = [
