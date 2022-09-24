@@ -52,8 +52,8 @@
     <div class="box">
         <fieldset>
             <legend> <b> Info/Disclaimer </b> </legend>
-            <p> This app is not an official app audited by
-            Curve.fi and is developed by Dives Research voluntarily. </p> 
+            <p> This app is not an official app from Curve.fi 
+                and is developed by Dives Research voluntarily. </p> 
         </fieldset>
     </div>
 
@@ -122,9 +122,12 @@
             
                 {A, n} = await fetchPoolDatas(chainName, poolName),
 
-                loss = calculateIL(A, 1, initPrice, finalPrice, n)
+                loss = calculateIL(A, initPrice, finalPrice, n)
             
-                result.innerText = `Impermanent Loss: ${parseFloat(loss).toFixed(2)}% `
+                result.innerText = `
+                Initial distribution of the pool: ${parseFloat(loss.initialAmounts[0]).toFixed(4)} - ${parseFloat(loss.initialAmounts[1]).toFixed(4)}
+                Final distribution of the pool: ${parseFloat(loss.finalAmounts[0]).toFixed(4)} - ${parseFloat(loss.finalAmounts[1]).toFixed(4)}
+                Impermanent Loss: ${parseFloat(loss.impermanentLoss).toFixed(2)}% `
         })
         
     </script>
