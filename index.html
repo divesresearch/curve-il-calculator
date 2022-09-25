@@ -106,10 +106,10 @@
             prices.innerHTML = ``
             for(let i = 0; i < tokens.length; i++){
                 prices.innerHTML += `
-       <input class="text" id="initial_price_${i}" name="fname" value=""
-                    placeholder="Initial ${tokens[i]} Price">
-       <input class="text" id="final_price_${i}" name="fname" value=""
-       placeholder="Final ${tokens[i]} Price">
+                   <input type="number" class="text" id="initial_price_${i}" name="fname" 
+                        value="" placeholder="Initial ${tokens[i]} Price" >
+                   <input class="text" id="final_price_${i}" name="fname" 
+                        value="" placeholder="Final ${tokens[i]} Price" >
                `
             }
         })
@@ -126,6 +126,7 @@
                         .map( selector => 
                             selector.options[selector.selectedIndex].value ),
 
+            
                 [initialPrices, finalPrices] = 
                     ['initial_price', 'final_price']
                         .map( idPrefix => {
@@ -136,29 +137,41 @@
                                                 i).value 
                                     )
                                 }
-                            return res.map( parseFloat)
-                        }),
-            
+                            return res
+                        })
+
+            if( 
+                [initialPrices, finalPrices]
+                    .find(prices => 
+                        prices.find( (price) => price <= 0 ) != undefined)
+            ){
+                result.innerHTML = 'Enter a positive number'
+                return
+            }
+
+            [initialPrices, finalPrices]
+                .forEach( prices => prices = prices.map(parseFloat) )
+
+            const
                 {A, n} = await fetchPoolDatas(chainName, poolName),
 
-                loss = calculateIL(A, initialPrices, finalPrices, n)
+                { initialAmounts, finalAmounts, impermanentLoss } =
+                        calculateIL(A, initialPrices, finalPrices, n),
 
-                console.log( initialPrices, finalPrices)
-            
-                let { initialAmounts, finalAmounts, impermanentLoss } = loss;
-                    result.innerText = `Initial distribution: ${
-                                initialAmounts
+                [initialAmountsStr, finalAmountsStr] = 
+                        [initialAmounts, finalAmounts]
+                            .map( amounts => 
+                                amounts
                                     .map(parseFloat)
                                     .map( amount => amount.toFixed(4) )
                                     .join(' - ')
-                    } 
-                    Final distribution: ${
-                                finalAmounts
-                                    .map(parseFloat)
-                                    .map( amount => amount.toFixed(4) )
-                                    .join(' - ')
-                            }
-                Impermanent Loss: ${parseFloat(loss.impermanentLoss).toFixed(2)}% `
+                            )
+
+                result.innerText = `
+                    Initial distribution: ${ initialAmountsStr } 
+                    Final distribution: ${ finalAmountsStr }
+                    Impermanent Loss: ${parseFloat(impermanentLoss).toFixed(2)}% 
+                `
         })
         
     </script>
