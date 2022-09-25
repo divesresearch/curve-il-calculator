@@ -81,7 +81,7 @@
                 blockchains.add( option )
             )
 
-        blockchains.addEventListener('click', () => {
+        blockchains.addEventListener('change', () => {
             const 
                 chainName = 
                     blockchains.options[blockchains.selectedIndex].value,
@@ -101,7 +101,7 @@
             }
         })
 
-        pools.addEventListener('click', () => {
+        pools.addEventListener('change', () => {
             const tokens = pools.options[pools.selectedIndex].value.split('-')
             prices.innerHTML = ``
             for(let i = 0; i < tokens.length; i++){
