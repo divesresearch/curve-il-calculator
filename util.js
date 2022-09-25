@@ -70,7 +70,7 @@ function find_x_y_z({
     prices,
     n, // Number of tokens in the pool
     x = 16,
-    iteration = 30 
+    iteration = 50 
 }) {
     let y, y2, x1, precision_x, precision_z = z / 2
     for (let i = 0; i < iteration; i++) {
@@ -117,27 +117,33 @@ function calculateIL(A, initialPrices, finalPrices, n) {
     if ( n == 3 ) return calculateILFor3(A, initialPrices, finalPrices, n)
 }
 
-function calculateILFor2(A, initialPrice, finalPrice, n) {
-    let value_1, value_2, initialAmounts, finalAmounts
+function calculateILFor2(A, initialPrices, finalPrices, n) {
+    let value_1, value_2, 
+        initialAmounts, finalAmounts
+
+    const 
+        initialRelativePrice = initialPrices[0] / initialPrices [1],
+        finalRelativePrice = finalPrices[0] / finalPrices [1]
+        
 
     // Value if not in the liquidity pool
-    if (initialPrice <= 1) {
-        initialAmounts = findAmounts({A, prices: initialPrice, n})
-        value_1 = initialAmounts[0] * finalPrice + initialAmounts[1]
+    if (initialRelativePrice <= 1) {
+        initialAmounts = findAmounts({A, prices: initialRelativePrice, n})
+        value_1 = initialAmounts[0] * finalRelativePrice + initialAmounts[1]
     }
     else {
-        initialAmounts = findAmounts({A, prices: 1 / initialPrice, n})
-        value_1 = initialAmounts[1] * finalPrice + initialAmounts[0]
+        initialAmounts = findAmounts({A, prices: 1 / initialRelativePrice, n})
+        value_1 = initialAmounts[1] * finalRelativePrice + initialAmounts[0]
     }
 
     // Value if in the liquidity pool
-    if (finalPrice <= 1) {
-        finalAmounts = findAmounts({A, prices: finalPrice, n})
-        value_2 = finalAmounts[0] * finalPrice + finalAmounts[1]
+    if (finalRelativePrice <= 1) {
+        finalAmounts = findAmounts({A, prices: finalRelativePrice, n})
+        value_2 = finalAmounts[0] * finalRelativePrice + finalAmounts[1]
     }
     else {
-        finalAmounts = findAmounts({A, prices: 1 / finalPrice, n})
-        value_2 = finalAmounts[1] * finalPrice + finalAmounts[0]
+        finalAmounts = findAmounts({A, prices: 1 / finalRelativePrice, n})
+        value_2 = finalAmounts[1] * finalRelativePrice + finalAmounts[0]
     }
     // Impermanent loss
     return {
@@ -162,7 +168,7 @@ function calculateILFor3(A, initialPrices, finalPrices, n){
                                     initialPrices[2] / initialPrices[0]],
         final_relative_prices =     [finalPrices[1] / finalPrices[0], 
                                     finalPrices[2] / finalPrices[0]]
-
+    
     initialAmounts = findAmounts({A, prices: initial_relative_prices, n})
     initialAmounts.sort((a, b) => a - b)
     finalAmounts = findAmounts({A, prices: final_relative_prices, n})
@@ -175,7 +181,9 @@ function calculateILFor3(A, initialPrices, finalPrices, n){
         // Value if in the liquidity pool
         value_2 += finalAmounts[i] * finalPrices[i]
     }
-    
+    console.log(initialAmounts, initialPrices)
+    console.log(finalAmounts, finalPrices)
+    console.log(value_1, value_2)
     // Impermanent loss
     return {
         impermanentLoss: (1 - (value_2 / value_1)) * 100,
