@@ -37,11 +37,7 @@
                 </div>
             </div>
             <br>
-            <input class="text" id="initial_price" name="fname" value=""
-            placeholder="Initial Price">
-            <input class="text" id="final_price" name="fname" value=""
-            placeholder="Final Price">
-            <br> <br> 
+            <div id="prices"> </div>
             <button id="calculate"> Calculate </button>
             <div id="result" style="margin-top: 15x;"> 
             </div>
@@ -57,22 +53,22 @@
         </fieldset>
     </div>
 
-    <div style=" white; position: fixed; bottom: 0; right: 0; width: 100%;">
-        <center>
-            <a href="https://www.dives.fyi"><img src="images/dives.png"
-                class="icon"></a> 
-            <a href="https://github.com/orgs/divesresearch/repositories"><img
-                src="images/github.png" class="icon"></a>
-            <a href="https://twitter.com/DivesResearch"><img
-               src="images/twitter.png" class="icon"/></a>
-            <a href="https://t.me/divesresearch"><img src="images/telegram.png"
-                class="icon"/></a>
-        </center>
+    <div class="icon-bar">
+        <a href="https://www.dives.fyi"><img src="images/dives.png"
+            class="icon"></a> 
+        <a href="https://github.com/orgs/divesresearch/repositories"><img
+            src="images/github.png" class="icon"></a>
+        <a href="https://twitter.com/DivesResearch"><img
+           src="images/twitter.png" class="icon"/></a>
+        <a href="https://t.me/divesresearch"><img src="images/telegram.png"
+            class="icon"/></a>
     </div>
+    <br>
+
     <script>
         const
-            [blockchains, pools, calculate, result] = 
-                ["blockchains", "pools", "calculate", "result"]
+            [blockchains, pools, calculate, prices, result] = 
+                ["blockchains", "pools", "calculate", "prices", "result"]
                     .map( id => document.getElementById(id) )
 
         chainDatas
@@ -105,28 +101,63 @@
             }
         })
 
+        pools.addEventListener('click', () => {
+            const tokens = pools.options[pools.selectedIndex].value.split('-')
+            prices.innerHTML = ``
+            for(let i = 0; i < tokens.length; i++){
+                prices.innerHTML += `
+       <input class="text" id="initial_price_${i}" name="fname" value=""
+                    placeholder="Initial ${tokens[i]} Price">
+       <input class="text" id="final_price_${i}" name="fname" value=""
+       placeholder="Final ${tokens[i]} Price">
+               `
+            }
+        })
+
         calculate.addEventListener('click', async () => {
             
             result.innerHTML = '<img src="images/clock.gif" width="30px" \
-                    height="30px"/>'
+                        height="30px"/>'
             const 
+                tokens = pools.options[pools.selectedIndex].value.split('-'),
+                        
                 [chainName, poolName] = 
                     [blockchains, pools]
                         .map( selector => 
                             selector.options[selector.selectedIndex].value ),
 
-                [initPrice, finalPrice] = 
+                [initialPrices, finalPrices] = 
                     ['initial_price', 'final_price']
-                        .map( id => document.getElementById(id).value )
-                        .map( parseFloat ),
+                        .map( idPrefix => {
+                            let res = []
+                                for(let i = 0; i < tokens.length; i++){
+                                    res.push(
+                                        document.getElementById(idPrefix + '_' +
+                                                i).value 
+                                    )
+                                }
+                            return res.map( parseFloat)
+                        }),
             
                 {A, n} = await fetchPoolDatas(chainName, poolName),
 
-                loss = calculateIL(A, initPrice, finalPrice, n)
+                loss = calculateIL(A, initialPrices, finalPrices, n)
+
+                console.log( initialPrices, finalPrices)
             
-                result.innerText = `
-                Initial distribution of the pool: ${parseFloat(loss.initialAmounts[0]).toFixed(4)} - ${parseFloat(loss.initialAmounts[1]).toFixed(4)}
-                Final distribution of the pool: ${parseFloat(loss.finalAmounts[0]).toFixed(4)} - ${parseFloat(loss.finalAmounts[1]).toFixed(4)}
+                let { initialAmounts, finalAmounts, impermanentLoss } = loss;
+                    result.innerText = `Initial distribution: ${
+                                initialAmounts
+                                    .map(parseFloat)
+                                    .map( amount => amount.toFixed(4) )
+                                    .join(' - ')
+                    } 
+                    Final distribution: ${
+                                finalAmounts
+                                    .map(parseFloat)
+                                    .map( amount => amount.toFixed(4) )
+                                    .join(' - ')
+                            }
                 Impermanent Loss: ${parseFloat(loss.impermanentLoss).toFixed(2)}% `
         })
         

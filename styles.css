@@ -57,6 +57,7 @@ input.text{
     padding: 12px 20px;
     border-radius: 4px;
     box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
 .box {
@@ -66,11 +67,18 @@ input.text{
     margin-top: 35px;
     border: 6px double #fff;
     box-shadow: 0 0 0 3px silver,1em 1em 3px 0 rgba(0,0,0,.5)
-}
+.}
 
 .box p {
     text-align: center;
     margin: 0px;
+}
+
+.icon-bar {
+    display: inline-block;
+    position: fixed;
+    right: 35px;
+    top: 35px;
 }
 
 .icon {
