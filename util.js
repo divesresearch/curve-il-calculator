@@ -79,7 +79,7 @@ function find_x_y({
 function find_x_y_z({
     A, // Amplification Coefficient
     D, // Total amount of coins when they have an equal price
-    z = 0.8, 
+    z = 1.6, 
     prices,
     n, // Number of tokens in the pool
     x = 16,
