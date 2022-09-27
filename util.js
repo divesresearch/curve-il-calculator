@@ -137,7 +137,7 @@ function find_x_y_z({
                 
                 
                 if ( y2 != y1 ) {
-                    if (prices[0] > 1)
+                    if (price1 > 1)
                         x1 = y2 < y1 
                             ? x1 - precision_x
                             : x1 + precision_x
