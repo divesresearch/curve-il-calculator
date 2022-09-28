@@ -122,26 +122,38 @@ function find_x_y_z({
             x1 = x
             precision_x = x / 2
             for (let j = 0; j < iteration; j++) {
-                // Solve StableSwap Equation
-                y1 = solvePolynomial(
-                    (A * (n ** n)), 
-                    ((A * (n ** n)) * (x1 + z) + D - ((A * (n ** n)) * D)), 
-                    -((D ** (n + 1)) / ((n ** n) * x1 * z))
-                )
+                if (price1 > 1) {
+                    // Solve dy/dz Equation
+                    y1 = solvePolynomial(
+                        (A * (n ** n) * (1 - price2)), 
+                        (D ** (n + 1)) / (x1 * ((n ** n) * (z ** 2))), 
+                        ((D ** (n + 1)) * (-1 * price2)) / (z * ((n ** n) * x1))
+                    )
 
-                // Solve dz/dx Equation
-                y2 =  -((1 / ((x1 ** 2) * z)) 
-                        + ((-1 * price1) / ((z ** 2) * x1))) * (D ** (n + 1)) 
-                        / (A * (n ** (2 * n)) * (1 - price1))
-                
-                
-                
-                if ( y2 != y1 ) {
-                    if (price1 > 1)
+                    // Solve dz/dx Equation
+                    y2 =  -((1 / ((x1 ** 2) * z)) 
+                            + ((-1 * price1) / ((z ** 2) * x1))) * (D ** (n + 1)) 
+                            / (A * (n ** (2 * n)) * (1 - price1))
+                    
+                    if ( y2 != y1 ) 
                         x1 = y2 < y1 
                             ? x1 - precision_x
                             : x1 + precision_x
-                    else
+                }
+                else {
+                    // Solve StableSwap Equation
+                    y1 = solvePolynomial(
+                        (A * (n ** n)), 
+                        ((A * (n ** n)) * (x1 + z) + D - ((A * (n ** n)) * D)), 
+                        -((D ** (n + 1)) / ((n ** n) * x1 * z))
+                    )
+
+                    // Solve dz/dx Equation
+                    y2 =  -((1 / ((x1 ** 2) * z)) 
+                            + ((-1 * price1) / ((z ** 2) * x1))) * (D ** (n + 1)) 
+                            / (A * (n ** (2 * n)) * (1 - price1))
+                    
+                    if ( y2 != y1 )
                         x1 = y2 < y1 
                             ? x1 + precision_x
                             : x1 - precision_x
@@ -150,17 +162,33 @@ function find_x_y_z({
                 precision_x /= 2
             }
         }
-        // Solve dy/dz Equation
-        y3 = solvePolynomial(
-                            (A * (n ** n) * (1 - price2)), 
-                            (D ** (n + 1)) / (x1 * ((n ** n) * (z ** 2))), 
-                            ((D ** (n + 1)) * (-1 * price2)) / (z * ((n ** n) * x1))
-                        )
-        if ( y3 != y1 )
+        if (price1 > 1) {
+            // Solve StableSwap Equation
+            y3 = solvePolynomial(
+                (A * (n ** n)), 
+                ((A * (n ** n)) * (x1 + z) + D - ((A * (n ** n)) * D)), 
+                -((D ** (n + 1)) / ((n ** n) * x1 * z))
+            )
+            
+            if ( y3 != y1 )
+                z = y3 < y1
+                    ? z - precision_z
+                    : z + precision_z
+        }
+        else {
+            // Solve dy/dz Equation
+            y3 = solvePolynomial(
+                (A * (n ** n) * (1 - price2)), 
+                (D ** (n + 1)) / (x1 * ((n ** n) * (z ** 2))), 
+                ((D ** (n + 1)) * (-1 * price2)) / (z * ((n ** n) * x1))
+            )
+            
+            if ( y3 != y1 )
             z = y3 < y1
                 ? z + precision_z
                 : z - precision_z
-
+        }
+        
         precision_z /= 2
     }
     
