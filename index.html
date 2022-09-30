@@ -111,7 +111,7 @@
                 prices.innerHTML += `
                    <input type="number" class="text" id="initial_price_${i}" name="fname" 
                         value="" placeholder="Initial ${tokens[i]} Price" >
-                   <input class="text" id="final_price_${i}" name="fname" 
+                   <input type="number" class="text" id="final_price_${i}" name="fname" 
                         value="" placeholder="Final ${tokens[i]} Price" >
                `
             }
@@ -130,7 +130,7 @@
                             selector.options[selector.selectedIndex].value ),
 
             
-                [initialPrices, finalPrices] = 
+                [initialPricesArgs, finalPricesArgs] = 
                     ['initial_price', 'final_price']
                         .map( idPrefix => {
                             let res = []
@@ -144,7 +144,7 @@
                         })
 
             if( 
-                [initialPrices, finalPrices]
+                [initialPricesArgs, finalPricesArgs]
                     .find(prices => 
                         prices.find( (price) => price <= 0 ) != undefined)
             ){
@@ -152,10 +152,11 @@
                 return
             }
 
-            [initialPrices, finalPrices]
-                .forEach( prices => prices = prices.map(parseFloat) )
-
-            const
+            const 
+                [initialPrices, finalPrices] = 
+                        [initialPricesArgs, finalPricesArgs]
+                            .map( prices => prices.map(parseFloat) ),
+            
                 {A, n} = await fetchPoolDatas(chainName, poolName),
 
                 { initialAmounts, finalAmounts, impermanentLoss } =
