@@ -61,10 +61,11 @@ input.text{
 }
 
 .box {
+    display: block;
     background: silver;
     width: 40%;
     margin: 0 auto;
-    margin-top: 35px;
+    margin-bottom: 35px;
     border: 6px double #fff;
     box-shadow: 0 0 0 3px silver,1em 1em 3px 0 rgba(0,0,0,.5)
 .}
@@ -75,10 +76,15 @@ input.text{
 }
 
 .icon-bar {
-    display: inline-block;
-    position: fixed;
-    right: 35px;
-    top: 35px;
+    position: absolute;
+    right: 0px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    height: 50px;
+    width: 150px;
 }
 
 .icon {
